@@ -1,0 +1,59 @@
+# 로깅 및 기타 설정을 위한 전역 옵션 블록
+{
+    # (선택 사항이지만 권장) 더 나은 분석을 위해 구조화된 JSON 로깅 구성
+    log {
+        output file /var/log/caddy/caddy.log {
+            roll_size 10mb
+            roll_keep 5
+        }
+        format json
+        level INFO
+    }
+}
+
+# 공개적으로 접근 가능한 프록시 도메인. Caddy가 이 도메인에 대한 HTTPS 인증서를 자동으로 발급합니다.
+claude-proxy.your-domain.com {
+    # 클라이언트가 보낸 원래 Host 헤더를 기반으로 요청을 라우팅합니다.
+    # 이를 통해 필요한 모든 Anthropic 도메인을 하나의 프록시 엔드포인트로 처리할 수 있습니다.
+
+    # 메인 API로 향하는 요청 처리
+    @api host api.anthropic.com
+    handle @api {
+        reverse_proxy https://api.anthropic.com {
+            # 가장 중요한 부분입니다. 업스트림 Host 헤더를
+            # 목적지와 일치시켜 TLS 핸드셰이크(SNI)가 성공하도록 합니다.
+            header_up Host {upstream_hostport}
+        }
+    }
+
+    # 원격 측정을 위한 요청 처리
+    @statsig host statsig.anthropic.com
+    handle @statsig {
+        reverse_proxy https://statsig.anthropic.com {
+            header_up Host {upstream_hostport}
+        }
+    }
+
+    # 오류 보고를 위한 요청 처리
+    @sentry host sentry.io
+    handle @sentry {
+        reverse_proxy https://sentry.io {
+            header_up Host {upstream_hostport}
+        }
+    }
+
+    # 웹 콘솔 로그인 및 관리를 위한 요청 처리
+    @console host console.anthropic.com
+    handle @console {
+        reverse_proxy https://console.anthropic.com {
+            header_up Host {upstream_hostport}
+        }
+    }
+
+    # 다른 모든 요청에 대한 폴백 처리 (선택 사항, 디버깅에 유용)
+    handle {
+        abort
+        # 또는 오류 응답
+        # respond "Unknown host" 404
+    }
+}
