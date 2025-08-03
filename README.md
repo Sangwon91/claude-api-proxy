@@ -1,3 +1,3 @@
 ```bash
-export HTTPS_PROXY=https://claude-proxy.your-domain.com:8443
+export HTTPS_PROXY=https://claude-lsw91.duckdns.org:18443
 ```
