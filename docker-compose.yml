@@ -7,8 +7,8 @@ services:
     restart: unless-stopped
     ports:
       - "80:80"
-      - "8443:443"
-      - "8443:443/udp" # HTTP/3에 필요
+      - "18443:443"
+      - "18443:443/udp" # HTTP/3에 필요
     volumes:
       -./Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
