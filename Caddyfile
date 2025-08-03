@@ -12,7 +12,7 @@
 }
 
 # 공개적으로 접근 가능한 프록시 도메인. Caddy가 이 도메인에 대한 HTTPS 인증서를 자동으로 발급합니다.
-claude-lsw91.duckdns.org {
+claude-lsw91.duckdns.org, localhost:18443 {
     # 클라이언트가 보낸 원래 Host 헤더를 기반으로 요청을 라우팅합니다.
     # 이를 통해 필요한 모든 Anthropic 도메인을 하나의 프록시 엔드포인트로 처리할 수 있습니다.
 
